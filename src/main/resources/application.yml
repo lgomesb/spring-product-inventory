@@ -1,9 +1,0 @@
-server: 
-  servlet:
-    context-path: /product-inventory
-spring:
-  application:
-    name: ms-product-inventory
-  profiles:
-    active:
-    - dev
