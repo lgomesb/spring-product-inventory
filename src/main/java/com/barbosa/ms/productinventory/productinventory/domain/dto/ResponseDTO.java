@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
 @ToString(callSuper = true)
-public abstract class ResponseDTO extends DataDTO {
+public abstract class ResponseDTO{
 
     private UUID id;
 }
