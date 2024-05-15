@@ -1,14 +1,9 @@
 package com.barbosa.ms.productinventory.productinventory.services.failed;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
-
-import java.util.Optional;
-import java.util.UUID;
-
+import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
+import com.barbosa.ms.productinventory.productinventory.domain.records.ProductInventoryRecord;
+import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
+import com.barbosa.ms.productinventory.productinventory.services.impl.ProductInventoryServiceImpl;
 import org.hibernate.ObjectNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,10 +12,12 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
-import com.barbosa.ms.productinventory.productinventory.domain.records.ProductInventoryRecord;
-import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
-import com.barbosa.ms.productinventory.productinventory.services.impl.ProductInventoryServiceImpl;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 class ProductInventoryServiceFailedTest {
@@ -91,12 +88,12 @@ class ProductInventoryServiceFailedTest {
         void productinventoryInicietedForFailueReturn() {
            productinventory = ProductInventory.builder()
                         .id(creationIdOfProductInventory())
-                        .name(null)
+                        .productId(null)
                         .build();
         }
 
         void productinventoryRecordInicietedForFailueReturn () {
-            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(), null);
+            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(), null, 0);
         }
     }
 

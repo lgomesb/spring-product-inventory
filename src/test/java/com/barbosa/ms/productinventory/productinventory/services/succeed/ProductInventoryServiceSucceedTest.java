@@ -1,28 +1,31 @@
 package com.barbosa.ms.productinventory.productinventory.services.succeed;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import java.util.*;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
 import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
 import com.barbosa.ms.productinventory.productinventory.domain.records.ProductInventoryRecord;
 import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
 import com.barbosa.ms.productinventory.productinventory.services.impl.ProductInventoryServiceImpl;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
+@ExtendWith(MockitoExtension.class)
 class ProductInventoryServiceSucceedTest {
 
+    private static final UUID PRODUCT_ID = UUID.randomUUID();
+    private static final Integer QUANTITY = 1;
     @InjectMocks
     private ProductInventoryServiceImpl service;
 
@@ -31,15 +34,10 @@ class ProductInventoryServiceSucceedTest {
     
     private ProductInventory productinventory;
     private ProductInventoryRecord productinventoryRecord;
-    private Given given = new Given();
-    private When when = new When();
-    private Then then = new Then();
+    private final Given given = new Given();
+    private final When when = new When();
+    private final Then then = new Then();
 
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void shouldSuccessWhenCreate() {
@@ -95,12 +93,13 @@ class ProductInventoryServiceSucceedTest {
         void productinventoryInicietedForSuccessfulReturn() {
            productinventory = ProductInventory.builder()
                         .id(creationIdOfProductInventory())
-                        .name("ProductInventory-Test-Success")
+                        .productId(PRODUCT_ID)
+                        .quantity(QUANTITY)
                         .build();
         }
 
         void productinventoryRecordInicietedForSuccessfulReturn () {
-            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(), productinventory.getName());
+            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(), PRODUCT_ID, QUANTITY);
         }
     }
 
@@ -148,8 +147,8 @@ class ProductInventoryServiceSucceedTest {
 
         void shouldBeSuccessfulValidationRules(ProductInventoryRecord record) {
             assertNotNull(record);
-            assertNotNull(record.name());
-            assertEquals(record.name(), productinventory.getName());
+            assertNotNull(record.productId());
+            assertEquals(record.productId(), productinventory.getProductId());
             assertNotNull(record.id());
             assertEquals(record.id(), productinventory.getId());
         }
@@ -158,14 +157,14 @@ class ProductInventoryServiceSucceedTest {
             ArgumentCaptor<ProductInventory> productinventoryCaptor = ArgumentCaptor.forClass(ProductInventory.class);
             verify(repository).delete(productinventoryCaptor.capture());
             assertNotNull(productinventoryCaptor.getValue());
-            assertEquals(productinventoryCaptor.getValue().getName(),productinventory.getName());
+            assertEquals(productinventoryCaptor.getValue().getProductId(),productinventory.getProductId());
         }
 
         void shouldBeSuccessfulArgumentValidationByUpdate() {
             ArgumentCaptor<ProductInventory> productinventoryCaptor = ArgumentCaptor.forClass(ProductInventory.class);
             verify(repository).save(productinventoryCaptor.capture());
             assertNotNull(productinventoryCaptor.getValue());
-            assertEquals(productinventoryCaptor.getValue().getName(),productinventory.getName());
+            assertEquals(productinventoryCaptor.getValue().getProductId(),productinventory.getProductId());
         }
 
         void shouldBeSuccessfulArgumentValidationByListAll(List<ProductInventoryRecord> productinventoryRecords) {

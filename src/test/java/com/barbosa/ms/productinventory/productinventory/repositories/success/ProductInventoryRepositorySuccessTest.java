@@ -1,27 +1,19 @@
 package com.barbosa.ms.productinventory.productinventory.repositories.success;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import java.util.Optional;
-import java.util.stream.Stream;
-
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import com.barbosa.ms.productinventory.productinventory.ProductInventoryApplicationTests;
+import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
+import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import com.barbosa.ms.productinventory.productinventory.ProductInventoryApplicationTests;
-import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
-import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles(value = "test")
 @DataJpaTest()
@@ -30,15 +22,11 @@ import com.barbosa.ms.productinventory.productinventory.repositories.ProductInve
 @TestInstance(Lifecycle.PER_CLASS)
 class ProductInventoryRepositorySuccessTest {
 
+    private static final UUID PRODUCT_ID = UUID.randomUUID();
+    private static final Integer QUANTITY = 1;
+    
     @Autowired
     private ProductInventoryRepository repository;
-
-    private static Stream<Arguments> provideProductInventoryData() {        
-        return Stream.of(
-          Arguments.of("ProductInventory-Test-01"),
-          Arguments.of("ProductInventory-Test-02")
-        );
-    }
 
     
     @Test 
@@ -48,46 +36,42 @@ class ProductInventoryRepositorySuccessTest {
     }
 
     @Order(1)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldWhenCallCreate(String productinventoryName) {
-        ProductInventory productinventory = repository.saveAndFlush(new ProductInventory(productinventoryName));
+    @Test
+    void shouldWhenCallCreate() {
+        ProductInventory productinventory = repository.saveAndFlush(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
         assertNotNull(productinventory, "Should return ProductInventory is not null");
         assertNotNull(productinventory.getId());
-        assertEquals(productinventoryName, productinventory.getName());        
+        assertEquals(PRODUCT_ID, productinventory.getProductId());
     }
 
 
     @Order(2)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldWhenCallFindById(String productinventoryName) {
-        ProductInventory productinventory = repository.save(new ProductInventory(productinventoryName));
+    @Test
+    void shouldWhenCallFindById() {
+        ProductInventory productinventory = repository.save(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         assertNotNull(oProductInventory.get(), "Should return ProductInventory is not null");
         assertNotNull(oProductInventory.get().getId(), "Should return ProductInventory ID is not null");
-        assertNotNull(oProductInventory.get().getName(), "Should return ProductInventory NAME is not null");
+        assertNotNull(oProductInventory.get().getProductId(), "Should return ProductInventory ProductId is not null");
     }
 
   
     @Order(3)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldWhenCallUpdate(String productinventoryName) {
-        String productinventoryNameUpdate = "Test-Update-ProductInventory";
-        ProductInventory productinventory = repository.save(new ProductInventory(productinventoryName));
+    @Test
+    void shouldWhenCallUpdate() {
+        ProductInventory productinventory = repository.save(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         ProductInventory newProductInventory = oProductInventory.get();
-        newProductInventory.setName(productinventoryNameUpdate);
+        newProductInventory.setProductId(UUID.randomUUID());
+        newProductInventory.setQuantity(2);
         newProductInventory = repository.save(newProductInventory);
-        assertEquals(productinventoryNameUpdate, newProductInventory.getName());
+        assertEquals(2, newProductInventory.getQuantity());
     }
   
     @Order(4)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldWhenCallDelete(String productinventoryName) {
-        ProductInventory productinventory = repository.save(new ProductInventory(productinventoryName));
+    @Test
+    void shouldWhenCallDelete() {
+        ProductInventory productinventory = repository.save(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         repository.delete(oProductInventory.get());
         Optional<ProductInventory> findProductInventory = repository.findById(oProductInventory.get().getId());

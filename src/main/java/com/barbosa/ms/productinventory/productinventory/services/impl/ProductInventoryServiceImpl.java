@@ -20,21 +20,28 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 
     @Override
     public ProductInventoryRecord create(ProductInventoryRecord recordObject) {
-        ProductInventory productinventory = repository.save(new ProductInventory(recordObject.name()) );
-        return new ProductInventoryRecord(productinventory.getId(), productinventory.getName());
+        ProductInventory productinventory = repository.save(
+                ProductInventory.builder()
+                .productId(recordObject.productId())
+                .quantity(recordObject.quantity())
+                .build());
+        return new ProductInventoryRecord(productinventory.getId(),
+                productinventory.getProductId(), productinventory.getQuantity() );
     }
 
     @Override
     public ProductInventoryRecord findById(UUID id) {
         ProductInventory productinventory = this.getProductInventoryById(id);
-        return new ProductInventoryRecord(productinventory.getId(), productinventory.getName());
+        return new ProductInventoryRecord(productinventory.getId(),
+                productinventory.getProductId(), productinventory.getQuantity());
     }
 
     
     @Override
     public void update(ProductInventoryRecord recordObject) {
         ProductInventory productinventory = this.getProductInventoryById(recordObject.id());
-        productinventory.setName(recordObject.name());
+        productinventory.setProductId(recordObject.productId());
+        productinventory.setQuantity(recordObject.quantity());
         productinventory.setModifieldOn(LocalDateTime.now());
         productinventory.setModifiedBy("99999");
         repository.save(productinventory);
@@ -58,7 +65,8 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
             .stream()
             .map(entity -> ProductInventoryRecord.builder()
                     .id(entity.getId())
-                    .name(entity.getName())
+                    .productId(entity.getProductId())
+                    .quantity(entity.getQuantity())
                     .build())
             .toList();
     }

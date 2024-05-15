@@ -1,34 +1,25 @@
 package com.barbosa.ms.productinventory.productinventory.repositories.failed;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Stream;
-
+import com.barbosa.ms.productinventory.productinventory.ProductInventoryApplicationTests;
+import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
+import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
+import jakarta.validation.ConstraintViolationException;
 import org.hibernate.ObjectNotFoundException;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
-import com.barbosa.ms.productinventory.productinventory.ProductInventoryApplicationTests;
-import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
-import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
 
-import jakarta.validation.ConstraintViolationException;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ActiveProfiles(value = "test")
 @DataJpaTest()
@@ -37,17 +28,13 @@ import jakarta.validation.ConstraintViolationException;
 @TestInstance(Lifecycle.PER_CLASS)
 class ProductInventoryRepositoryFailedTest {
 
+    private static final UUID PRODUCT_ID = UUID.randomUUID();
+    private static final Integer QUANTITY = 1;
+
     @Autowired
     private ProductInventoryRepository repository;
 
-    private static Stream<Arguments> provideProductInventoryData() {        
-        return Stream.of(
-          Arguments.of("ProductInventory-Test-01"),
-          Arguments.of("ProductInventory-Test-02")
-        );
-    }
 
-    
     @BeforeAll
     void shouldSuccessfulInjectComponent() {
         assertNotNull(repository);
@@ -58,16 +45,15 @@ class ProductInventoryRepositoryFailedTest {
     @DisplayName("Should return Exception when ProductInventory not null")
     void shouldFailWhenCallCreate() {
         assertThrows(ConstraintViolationException.class, () -> {
-            repository.saveAndFlush(new ProductInventory(null));
+            repository.saveAndFlush(new ProductInventory(null, PRODUCT_ID, QUANTITY));
         }, "Should return Error when ProductInventory not null");
     }
 
 
     @Order(1)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldFailWhenCallFindById(String productinventoryName) {
-        repository.save(new ProductInventory(productinventoryName));
+    @Test
+    void shouldFailWhenCallFindById() {
+        repository.save(new ProductInventory(null, PRODUCT_ID, QUANTITY));
         Optional<ProductInventory> oProductInventory = repository.findById(UUID.randomUUID());
         assertThrows( ObjectNotFoundException.class, () -> {
             oProductInventory.orElseThrow(() ->
@@ -77,24 +63,22 @@ class ProductInventoryRepositoryFailedTest {
 
   
     @Order(2)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldFailWhenCallUpdate(String productinventoryName) {
-        String productinventoryNameUpdate = "";
-        ProductInventory productinventory = repository.save(new ProductInventory(productinventoryName));
+    @Test
+    void shouldFailWhenCallUpdate() {
+        ProductInventory productinventory = repository.save(new ProductInventory(null, PRODUCT_ID, QUANTITY));
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());        
         assertThrows(ConstraintViolationException.class, () -> {
             ProductInventory newProductInventory = oProductInventory.get();
-            newProductInventory.setName(productinventoryNameUpdate);
+            newProductInventory.setProductId(UUID.randomUUID());
+            newProductInventory.setQuantity(2);
             repository.saveAndFlush(newProductInventory);
         }, "Should return Error when ProductInventory not blank or empty");
     }
   
     @Order(3)
-    @ParameterizedTest
-    @MethodSource("provideProductInventoryData")
-    void shouldFailWhenCallDelete(String productinventoryName) {
-        ProductInventory productinventory = new ProductInventory(UUID.randomUUID(), productinventoryName);
+    @Test
+    void shouldFailWhenCallDelete() {
+        ProductInventory productinventory = new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY);
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         assertThrows( InvalidDataAccessApiUsageException.class, () -> {
             repository.delete(oProductInventory.orElse(null));

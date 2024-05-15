@@ -14,8 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 
@@ -36,6 +34,8 @@ import static org.mockito.Mockito.when;
 @TestInstance(Lifecycle.PER_CLASS)
 class ProductInventoryControllerTest {
 
+    private static final UUID PRODUCT_ID = UUID.randomUUID();
+    private static final Integer QUANTITY = 1;
     private static UUID STATIC_UUID;
     private static final String STATIC_URI = "/product-inventory/";
 
@@ -55,7 +55,8 @@ class ProductInventoryControllerTest {
         MockitoAnnotations.openMocks(this);
         productinventoryRecord = ProductInventoryRecord.builder()
                 .id(UUID.randomUUID())
-                .name("Test-ProductInventory-01")
+                .productId(PRODUCT_ID)
+                .quantity(QUANTITY)
                 .build();
 
     }
@@ -69,7 +70,7 @@ class ProductInventoryControllerTest {
         Response response = given()
             .port(port)
             .contentType(ContentType.JSON)
-            .body("{\"name\": \""+ productinventoryRecord.name() +"\"}")
+            .body("{\"productId\": \""+ productinventoryRecord.productId() +"\"}")
             .log().all()
             .when()
             .post(STATIC_URI)
@@ -150,7 +151,7 @@ class ProductInventoryControllerTest {
     @Order(4)
     void shouldSucceededWhenCallListAll() {
         when(service.listAll()).thenReturn(
-                Collections.singletonList(new ProductInventoryRecord(STATIC_UUID, "Test-ProductInventory-01")));
+                Collections.singletonList(new ProductInventoryRecord(STATIC_UUID, PRODUCT_ID, QUANTITY)));
 
         given()
                 .port(port)
