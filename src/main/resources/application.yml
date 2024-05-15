@@ -6,4 +6,4 @@ spring:
     name: ms-product-inventory
   profiles:
     active:
-      - ${ENVIRONMENT}
+      - ${ENVIRONMENT:dev}
