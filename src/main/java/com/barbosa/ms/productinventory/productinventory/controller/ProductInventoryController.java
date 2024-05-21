@@ -7,7 +7,6 @@ import com.barbosa.ms.productinventory.productinventory.services.ProductInventor
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -21,12 +20,15 @@ import java.util.UUID;
 @RequestMapping("/")
 public class ProductInventoryController {
 
-    @Autowired
-    private ProductInventoryService service;
+    private final ProductInventoryService service;
+
+    public ProductInventoryController(ProductInventoryService service) {
+        this.service = service;
+    }
 
     @Operation(summary = "Create ProductInventory", description = "Create a new ProductInventory", tags = { "ProductInventory" })
     @PostMapping
-    public ResponseEntity<ProductInventoryResponseDTO> create(@RequestBody @Valid ProductInventoryRequestDTO dto) {
+    public ResponseEntity<ProductInventoryResponseDTO> create(@Valid @RequestBody ProductInventoryRequestDTO dto) {
 
         ProductInventoryRecord productinventoryRecord = service.create(new ProductInventoryRecord(
                 null, dto.getProductId(), dto.getQuantity()));
@@ -52,8 +54,8 @@ public class ProductInventoryController {
 
     @Operation(summary = "Update ProductInventory by Id", description = "Update ProductInventory by id", tags = { "ProductInventory" })
     @PutMapping("{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") String id, @RequestBody ProductInventoryRequestDTO dto) {
-        service.update(new ProductInventoryRecord(UUID.fromString(id), dto.getProductId(), dto.getQuantity()));
+    public ResponseEntity<Void> update(@PathVariable("id") UUID id, @Valid @RequestBody ProductInventoryRequestDTO dto) {
+        service.update(new ProductInventoryRecord(id, dto.getProductId(), dto.getQuantity()));
         return ResponseEntity.accepted().build();
     }
 

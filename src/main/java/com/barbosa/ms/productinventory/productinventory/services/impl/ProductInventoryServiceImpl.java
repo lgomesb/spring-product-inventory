@@ -5,7 +5,6 @@ import com.barbosa.ms.productinventory.productinventory.domain.records.ProductIn
 import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
 import com.barbosa.ms.productinventory.productinventory.services.ProductInventoryService;
 import org.hibernate.ObjectNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,8 +14,11 @@ import java.util.UUID;
 @Service
 public class ProductInventoryServiceImpl implements ProductInventoryService {
 
-    @Autowired
-    private ProductInventoryRepository repository;
+    private final ProductInventoryRepository repository;
+
+    public ProductInventoryServiceImpl(ProductInventoryRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public ProductInventoryRecord create(ProductInventoryRecord recordObject) {
