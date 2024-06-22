@@ -18,6 +18,9 @@ public class ProductInventoryRequestDTO {
     @NotNull(message = "{field.product-id.required}")
     private UUID productId;
 
+    @NotNull(message = "{field.product-order-id.required}")
+    private UUID productOrderId;
+
     @NotNull(message = "{field.quantity.required}")
     private Integer quantity;
 }

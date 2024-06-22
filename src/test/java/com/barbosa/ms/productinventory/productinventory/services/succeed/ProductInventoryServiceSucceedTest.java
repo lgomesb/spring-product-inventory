@@ -25,6 +25,7 @@ import static org.mockito.Mockito.*;
 class ProductInventoryServiceSucceedTest {
 
     private static final UUID PRODUCT_ID = UUID.randomUUID();
+    public static final UUID PRODUCT_ORDER_ID = UUID.randomUUID();
     private static final Integer QUANTITY = 1;
     @InjectMocks
     private ProductInventoryServiceImpl service;
@@ -99,7 +100,8 @@ class ProductInventoryServiceSucceedTest {
         }
 
         void productinventoryRecordInicietedForSuccessfulReturn () {
-            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(), PRODUCT_ID, QUANTITY);
+            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(),
+                    PRODUCT_ID, PRODUCT_ORDER_ID, QUANTITY);
         }
     }
 

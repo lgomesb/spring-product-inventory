@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ public abstract class AbstractEntity implements Serializable {
     @Column(columnDefinition = "varchar(1) not null default 'A'")
     private String status;
 
+    @CreationTimestamp
     @Column(name = "created_on")
     private LocalDateTime createdOn;
 
@@ -41,5 +43,11 @@ public abstract class AbstractEntity implements Serializable {
         setCreatedBy("99999");
         setStatus("A");
     }
-    
+
+    @PreUpdate
+    public void preUpdate() {
+        setModifieldOn(LocalDateTime.now());
+        setModifiedBy("8888");
+    }
+
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,16 +22,21 @@ public class ProductInventory extends AbstractEntity {
     @Column(columnDefinition = "varchar(255) not null")
     private UUID productId;
 
+    @NotNull(message = "{field.product-order-id.required}")
+    @Column(columnDefinition = "varchar(255) not null")
+    private UUID productOrderId;
+
     @NotNull(message = "{field.quantity.required}")
     @Column(columnDefinition = "int not null")
     private Integer quantity;
 
     @Builder()
-    public ProductInventory(UUID id, UUID productId, Integer quantity) {
+    public ProductInventory(UUID id, UUID productId, UUID productOrderId, Integer quantity) {
         super();
         super.setId(id);
         this.productId = productId;
         this.quantity = quantity;
+        this.productOrderId = productOrderId;
 
     }
 }

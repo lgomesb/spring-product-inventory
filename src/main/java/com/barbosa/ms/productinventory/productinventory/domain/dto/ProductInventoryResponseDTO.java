@@ -10,21 +10,24 @@ import java.util.UUID;
 public class ProductInventoryResponseDTO extends ResponseDTO {
 
     private UUID productId;
+    private UUID productOrderId;
     private Integer quantity;
 
     public static ProductInventoryResponseDTO create(ProductInventoryRecord productInventoryRecord) {
         return ProductInventoryResponseDTO.builder()
                 .id(productInventoryRecord.id())
                 .productId(productInventoryRecord.productId())
+                .productOrderId(productInventoryRecord.productOrderId())
                 .quantity(productInventoryRecord.quantity())
                 .build();
     }
 
     @Builder
-    public ProductInventoryResponseDTO(UUID id, UUID productId, Integer quantity) {
+    public ProductInventoryResponseDTO(UUID id, UUID productId, UUID productOrderId, Integer quantity) {
         super();
         this.productId = productId;
         this.quantity = quantity;
+        this.productOrderId = productOrderId;
         super.setId(id);
     }
 }

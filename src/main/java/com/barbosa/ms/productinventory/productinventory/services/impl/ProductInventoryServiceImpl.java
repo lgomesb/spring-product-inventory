@@ -1,13 +1,14 @@
 package com.barbosa.ms.productinventory.productinventory.services.impl;
 
 import com.barbosa.ms.productinventory.productinventory.domain.entities.ProductInventory;
+import com.barbosa.ms.productinventory.productinventory.domain.mappers.ProductInventoryMapper;
 import com.barbosa.ms.productinventory.productinventory.domain.records.ProductInventoryRecord;
 import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
 import com.barbosa.ms.productinventory.productinventory.services.ProductInventoryService;
 import org.hibernate.ObjectNotFoundException;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,27 +16,24 @@ import java.util.UUID;
 public class ProductInventoryServiceImpl implements ProductInventoryService {
 
     private final ProductInventoryRepository repository;
+    private final ModelMapper mapper;
 
-    public ProductInventoryServiceImpl(ProductInventoryRepository repository) {
+    public ProductInventoryServiceImpl(ProductInventoryRepository repository, ModelMapper mapper) {
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
-    public ProductInventoryRecord create(ProductInventoryRecord recordObject) {
-        ProductInventory productinventory = repository.save(
-                ProductInventory.builder()
-                .productId(recordObject.productId())
-                .quantity(recordObject.quantity())
-                .build());
-        return new ProductInventoryRecord(productinventory.getId(),
-                productinventory.getProductId(), productinventory.getQuantity() );
+    public ProductInventoryRecord create(ProductInventoryRecord recordInput) {
+        ProductInventory productinventory = mapper.map(recordInput, ProductInventory.class);
+        repository.save(productinventory);
+        return ProductInventoryMapper.toRecord(productinventory);
     }
 
     @Override
     public ProductInventoryRecord findById(UUID id) {
         ProductInventory productinventory = this.getProductInventoryById(id);
-        return new ProductInventoryRecord(productinventory.getId(),
-                productinventory.getProductId(), productinventory.getQuantity());
+        return ProductInventoryMapper.toRecord(productinventory);
     }
 
     
@@ -43,9 +41,8 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
     public void update(ProductInventoryRecord recordObject) {
         ProductInventory productinventory = this.getProductInventoryById(recordObject.id());
         productinventory.setProductId(recordObject.productId());
+        productinventory.setProductOrderId(recordObject.productOrderId());
         productinventory.setQuantity(recordObject.quantity());
-        productinventory.setModifieldOn(LocalDateTime.now());
-        productinventory.setModifiedBy("99999");
         repository.save(productinventory);
     }
     
@@ -53,25 +50,20 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
     public void delete(UUID id) {
         ProductInventory productinventory = this.getProductInventoryById(id);
         repository.delete(productinventory);
-
     }
     
-    private ProductInventory getProductInventoryById(UUID id) {
-        return repository.findById(id)
-                  .orElseThrow(()-> new ObjectNotFoundException("ProductInventory", id));
-    }
-
     @Override
     public List<ProductInventoryRecord> listAll() {
         return repository.findAll()
             .stream()
-            .map(entity -> ProductInventoryRecord.builder()
-                    .id(entity.getId())
-                    .productId(entity.getProductId())
-                    .quantity(entity.getQuantity())
-                    .build())
+            .map(ProductInventoryMapper::toRecord)
             .toList();
     }
-    
+
+    private ProductInventory getProductInventoryById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(()-> new ObjectNotFoundException("ProductInventory", id));
+    }
+
     
 }

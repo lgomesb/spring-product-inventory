@@ -2,8 +2,11 @@ package com.barbosa.ms.productinventory.productinventory.controllers;
 
 import com.barbosa.ms.productinventory.productinventory.ProductInventoryApplicationTests;
 import com.barbosa.ms.productinventory.productinventory.controller.ProductInventoryController;
+import com.barbosa.ms.productinventory.productinventory.domain.dto.ProductInventoryRequestDTO;
 import com.barbosa.ms.productinventory.productinventory.domain.records.ProductInventoryRecord;
 import com.barbosa.ms.productinventory.productinventory.services.ProductInventoryService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +41,9 @@ class ProductInventoryControllerTest {
     private static final Integer QUANTITY = 1;
     private static final UUID STATIC_UUID = UUID.randomUUID();
     private static final String STATIC_URI = "/product-inventory/";
+    public static final UUID PRODUCT_ORDER_ID = UUID.randomUUID();
+
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @LocalServerPort
     private int port;
@@ -54,11 +60,13 @@ class ProductInventoryControllerTest {
     private final When when = new When();
     private final Then then = new Then();
 
+
     @BeforeEach
     void setup() {
         productinventoryRecord = ProductInventoryRecord.builder()
                 .id(UUID.randomUUID())
                 .productId(PRODUCT_ID)
+                .productOrderId(PRODUCT_ORDER_ID)
                 .quantity(QUANTITY)
                 .build();
     }
@@ -131,7 +139,7 @@ class ProductInventoryControllerTest {
     @Test
     void shouldSucceededWhenCallListAll() {
         when(service.listAll()).thenReturn(
-                Collections.singletonList(new ProductInventoryRecord(STATIC_UUID, PRODUCT_ID, QUANTITY)));
+                Collections.singletonList(new ProductInventoryRecord(STATIC_UUID, PRODUCT_ID, PRODUCT_ORDER_ID, QUANTITY)));
 
         given()
                 .port(port)
@@ -145,10 +153,19 @@ class ProductInventoryControllerTest {
 
     }
 
-
     private class Given {
+
         public String productInventoryRequest() {
-            return String.format("{\"productId\": \"%s\", \"quantity\": \"%s\"}", productinventoryRecord.productId(), productinventoryRecord.quantity());
+            ProductInventoryRequestDTO dto = ProductInventoryRequestDTO.builder()
+                    .productId(productinventoryRecord.productId())
+                    .productOrderId(productinventoryRecord.productOrderId())
+                    .quantity(productinventoryRecord.quantity())
+                    .build();
+            try {
+                return mapper.writeValueAsString(dto);
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         public void createProductInventoryByService() {
@@ -168,6 +185,7 @@ class ProductInventoryControllerTest {
                     .post(STATIC_URI)
                     .then()
                     .assertThat()
+                    .log().all()
                     .statusCode(HttpStatus.CREATED.value())
                     .extract()
                     .response();

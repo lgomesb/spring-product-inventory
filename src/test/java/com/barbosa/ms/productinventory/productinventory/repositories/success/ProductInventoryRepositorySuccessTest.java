@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProductInventoryRepositorySuccessTest {
 
     private static final UUID PRODUCT_ID = UUID.randomUUID();
+    private static final UUID PRODUCT_ORDER_ID = UUID.randomUUID();
     private static final Integer QUANTITY = 1;
     
     @Autowired
@@ -38,7 +39,7 @@ class ProductInventoryRepositorySuccessTest {
     @Order(1)
     @Test
     void shouldWhenCallCreate() {
-        ProductInventory productinventory = repository.saveAndFlush(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
+        ProductInventory productinventory = repository.saveAndFlush(getProductInventory());
         assertNotNull(productinventory, "Should return ProductInventory is not null");
         assertNotNull(productinventory.getId());
         assertEquals(PRODUCT_ID, productinventory.getProductId());
@@ -48,18 +49,22 @@ class ProductInventoryRepositorySuccessTest {
     @Order(2)
     @Test
     void shouldWhenCallFindById() {
-        ProductInventory productinventory = repository.save(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
+        ProductInventory productinventory = repository.save(getProductInventory());
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         assertNotNull(oProductInventory.get(), "Should return ProductInventory is not null");
         assertNotNull(oProductInventory.get().getId(), "Should return ProductInventory ID is not null");
         assertNotNull(oProductInventory.get().getProductId(), "Should return ProductInventory ProductId is not null");
     }
 
-  
+    private ProductInventory getProductInventory() {
+        return new ProductInventory(UUID.randomUUID(), PRODUCT_ID, PRODUCT_ORDER_ID, QUANTITY);
+    }
+
+
     @Order(3)
     @Test
     void shouldWhenCallUpdate() {
-        ProductInventory productinventory = repository.save(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
+        ProductInventory productinventory = repository.save(getProductInventory());
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         ProductInventory newProductInventory = oProductInventory.get();
         newProductInventory.setProductId(UUID.randomUUID());
@@ -71,7 +76,7 @@ class ProductInventoryRepositorySuccessTest {
     @Order(4)
     @Test
     void shouldWhenCallDelete() {
-        ProductInventory productinventory = repository.save(new ProductInventory(UUID.randomUUID(), PRODUCT_ID, QUANTITY));
+        ProductInventory productinventory = repository.save(getProductInventory());
         Optional<ProductInventory> oProductInventory = repository.findById(productinventory.getId());
         repository.delete(oProductInventory.get());
         Optional<ProductInventory> findProductInventory = repository.findById(oProductInventory.get().getId());

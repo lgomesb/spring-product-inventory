@@ -31,7 +31,10 @@ public class ProductInventoryController {
     public ResponseEntity<ProductInventoryResponseDTO> create(@Valid @RequestBody ProductInventoryRequestDTO dto) {
 
         ProductInventoryRecord productinventoryRecord = service.create(new ProductInventoryRecord(
-                null, dto.getProductId(), dto.getQuantity()));
+                null,
+                dto.getProductId(),
+                dto.getProductOrderId(),
+                dto.getQuantity()));
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -45,17 +48,13 @@ public class ProductInventoryController {
     @GetMapping("{id}")
     public ResponseEntity<ProductInventoryResponseDTO> findById(@PathVariable("id") String id) {
         ProductInventoryRecord productinventoryRecord = service.findById(UUID.fromString(id));
-        return ResponseEntity.ok().body(ProductInventoryResponseDTO.builder()
-                .id(productinventoryRecord.id())
-                .productId(productinventoryRecord.productId())
-                .quantity(productinventoryRecord.quantity())
-                .build());
+        return ResponseEntity.ok().body(ProductInventoryResponseDTO.create(productinventoryRecord));
     }
 
     @Operation(summary = "Update ProductInventory by Id", description = "Update ProductInventory by id", tags = { "ProductInventory" })
     @PutMapping("{id}")
     public ResponseEntity<Void> update(@PathVariable("id") UUID id, @Valid @RequestBody ProductInventoryRequestDTO dto) {
-        service.update(new ProductInventoryRecord(id, dto.getProductId(), dto.getQuantity()));
+        service.update(new ProductInventoryRecord(id, dto.getProductId(), dto.getProductOrderId(), dto.getQuantity()));
         return ResponseEntity.accepted().build();
     }
 

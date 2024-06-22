@@ -93,7 +93,8 @@ class ProductInventoryServiceFailedTest {
         }
 
         void productinventoryRecordInicietedForFailueReturn () {
-            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(), null, 0);
+            productinventoryRecord = new ProductInventoryRecord(productinventory.getId(),
+                    null, null, 0);
         }
     }
 
