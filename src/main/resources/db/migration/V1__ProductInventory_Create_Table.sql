@@ -8,5 +8,6 @@ create table Product_Inventory (
     modified_by varchar(100),
     modified_on timestamp(6),
     status varchar(1) not null default 'A',
-    primary key (id)
+    primary key (id),
+    constraint cnsJustOneByProductAndOrderId unique (product_id, product_order_id)
 );

@@ -7,6 +7,7 @@ import com.barbosa.ms.productinventory.productinventory.repositories.ProductInve
 import com.barbosa.ms.productinventory.productinventory.services.ProductInventoryService;
 import org.hibernate.ObjectNotFoundException;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,9 +26,13 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 
     @Override
     public ProductInventoryRecord create(ProductInventoryRecord recordInput) {
-        ProductInventory productinventory = mapper.map(recordInput, ProductInventory.class);
-        repository.save(productinventory);
-        return ProductInventoryMapper.toRecord(productinventory);
+        try {
+            ProductInventory productinventory = mapper.map(recordInput, ProductInventory.class);
+            repository.save(productinventory);
+            return ProductInventoryMapper.toRecord(productinventory);
+        } catch (DataIntegrityViolationException ex) {
+            throw new DataIntegrityViolationException("There must be only one inventory per product and order");
+        }
     }
 
     @Override

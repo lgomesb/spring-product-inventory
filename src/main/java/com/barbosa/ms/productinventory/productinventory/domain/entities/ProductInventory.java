@@ -3,18 +3,17 @@ package com.barbosa.ms.productinventory.productinventory.domain.entities;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 
 
 @Data
+@EqualsAndHashCode(of = {"productId", "productOrderId", "quantity"}, callSuper = false)
 @NoArgsConstructor
-@Table
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"productId", "productOrderId"}, name = "cnsJustOneByProductAndOrderId")})
 @Entity
 public class ProductInventory extends AbstractEntity {
 

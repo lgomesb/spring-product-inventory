@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
 import org.hibernate.ObjectNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -29,6 +30,17 @@ public class ProductInventoryExceptionHandler {
         logger.info("#".repeat(10) + "ERROR HANDLER");
         e.getConstraintViolations().forEach(c -> logger.info(c.getMessage()));
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler( DataIntegrityViolationException.class )
+    public ResponseEntity<StandardError> dataIntegrityViolationError( DataIntegrityViolationException e, HttpServletRequest request) {
+        StandardError error = StandardError.builder()
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .messege(e.getMessage())
+                .path(request.getRequestURI())
+                .build();
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

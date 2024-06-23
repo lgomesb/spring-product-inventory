@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -49,6 +50,23 @@ class ProductInventoryRepositoryFailedTest {
                 "Should return Error when ProductInventory not null");
     }
 
+    @Test
+    void shouldThrowIntegrityViolationErrorWhenCreate() {
+        ProductInventory newProductInventory = repository.saveAndFlush(ProductInventory.builder()
+                .productId(UUID.randomUUID())
+                .productOrderId(UUID.randomUUID())
+                .quantity(10)
+                .build());
+
+        ProductInventory otherProductInventory = ProductInventory.builder()
+                .productId(newProductInventory.getProductId())
+                .productOrderId(newProductInventory.getProductOrderId())
+                .quantity(20)
+                .build();
+
+        assertThrows(DataIntegrityViolationException.class, () -> repository.saveAndFlush(otherProductInventory),
+                "Should return error integrity violation");
+    }
 
     @Order(1)
     @Test

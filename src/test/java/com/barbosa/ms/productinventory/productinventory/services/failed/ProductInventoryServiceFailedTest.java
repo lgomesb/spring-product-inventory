@@ -5,11 +5,14 @@ import com.barbosa.ms.productinventory.productinventory.domain.records.ProductIn
 import com.barbosa.ms.productinventory.productinventory.repositories.ProductInventoryRepository;
 import com.barbosa.ms.productinventory.productinventory.services.impl.ProductInventoryServiceImpl;
 import org.hibernate.ObjectNotFoundException;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.record.RecordModule;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.Optional;
@@ -20,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 
+@ExtendWith(MockitoExtension.class)
 class ProductInventoryServiceFailedTest {
 
     @InjectMocks
@@ -27,46 +31,44 @@ class ProductInventoryServiceFailedTest {
 
     @Mock
     private ProductInventoryRepository repository;
-    
+
+    @Spy
+    private final ModelMapper mapper = new ModelMapper().registerModule(new RecordModule());
+
     private ProductInventory productinventory;
     private ProductInventoryRecord productinventoryRecord;
-    private Given given = new Given();
-    private When when = new When();
-    private Then then = new Then();
+    private final Given given = new Given();
+    private final When when = new When();
+    private final Then then = new Then();
 
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
 
     @Test
     void shouldFailWhenCreate() {
-        given.productinventoryInicietedForFailueReturn();
-        given.productinventoryRecordInicietedForFailueReturn();
+        given.productInventoryInitiatedForFailedReturn();
+        given.productInventoryRecordInitiatedForFailedReturn();
         when.saveProductInventoryEntity();
         then.shouldBeFailueWhenCreateProductInventory(DataIntegrityViolationException.class);
     }
 
     @Test
     void shouldFailWhenFindById() {
-        given.productinventoryInicietedForFailueReturn();
+        given.productInventoryInitiatedForFailedReturn();
         when.findProductInventoryByIdWithFail();        
         then.shouldBeFailueWhenFindProductInventoryById(ObjectNotFoundException.class);
     }
 
     @Test
     void shouldFailWhenUpdateWithIdNonExistent() {
-        given.productinventoryInicietedForFailueReturn();
-        given.productinventoryRecordInicietedForFailueReturn();
+        given.productInventoryInitiatedForFailedReturn();
+        given.productInventoryRecordInitiatedForFailedReturn();
         when.findProductInventoryByIdWithFail();        
         then.shouldBeFailueWhenFindProductInventoryById(ObjectNotFoundException.class);    
     }
 
     @Test
     void shouldFailWhenUpdateWithInvalidArgument() {
-        given.productinventoryInicietedForFailueReturn();
-        given.productinventoryRecordInicietedForFailueReturn();
+        given.productInventoryInitiatedForFailedReturn();
+        given.productInventoryRecordInitiatedForFailedReturn();
         when.findProductInventoryById();
         when.saveProductInventoryEntity();
         then.shouldBeFailueWhenUpdateProductInventory(DataIntegrityViolationException.class);        
@@ -74,7 +76,7 @@ class ProductInventoryServiceFailedTest {
 
     @Test
     void shouldFailWhenDelete() {
-        given.productinventoryInicietedForFailueReturn();
+        given.productInventoryInitiatedForFailedReturn();
         when.findProductInventoryByIdWithFail();
         then.shouldBeFailueWhenDeleteProductInventory(ObjectNotFoundException.class);     
     }
@@ -85,14 +87,19 @@ class ProductInventoryServiceFailedTest {
             return UUID.randomUUID();
         }
 
-        void productinventoryInicietedForFailueReturn() {
-           productinventory = ProductInventory.builder()
+        public ProductInventory newProductInventory() {
+           return ProductInventory.builder()
                         .id(creationIdOfProductInventory())
                         .productId(null)
                         .build();
         }
 
-        void productinventoryRecordInicietedForFailueReturn () {
+        void productInventoryInitiatedForFailedReturn() {
+           productinventory = newProductInventory();
+            productinventory.setProductId(null);
+        }
+
+        void productInventoryRecordInitiatedForFailedReturn() {
             productinventoryRecord = new ProductInventoryRecord(productinventory.getId(),
                     null, null, 0);
         }

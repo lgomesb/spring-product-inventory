@@ -9,7 +9,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.record.RecordModule;
 
 import java.util.Collections;
 import java.util.List;
@@ -27,11 +30,15 @@ class ProductInventoryServiceSucceedTest {
     private static final UUID PRODUCT_ID = UUID.randomUUID();
     public static final UUID PRODUCT_ORDER_ID = UUID.randomUUID();
     private static final Integer QUANTITY = 1;
+
     @InjectMocks
     private ProductInventoryServiceImpl service;
 
     @Mock
     private ProductInventoryRepository repository;
+
+    @Spy
+    private ModelMapper mapper = new ModelMapper().registerModule(new RecordModule());
     
     private ProductInventory productinventory;
     private ProductInventoryRecord productinventoryRecord;
